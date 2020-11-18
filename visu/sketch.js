@@ -15,7 +15,8 @@ var sketchTwo = function(p) {
   p.graphOne;
   p.setup = function() {
     ranges = [2 * p.PI, 2 * p.PI, 2 * p.PI, 100]
-    p.graphOne = new graph(p, p.windowWidth/2, ranges);
+    labels = ['axis 1', 'axis 2', 'axis 3', 'z axis']
+    p.graphOne = new graph(p, p.windowWidth/2, ranges, labels);
   }
   p.draw = function() {
     p.graphOne.draw();

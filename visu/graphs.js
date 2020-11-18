@@ -1,13 +1,15 @@
 class graph {
-    constructor(p, width, ranges){
+    constructor(p, width, ranges, labels){
         this._p = p;
-        this._margin = 5;
+        this._margin = 12;
         this._readPos = 0;
         this._writePos = 0;
         this._valuesX = [];
-        this._height = 50;
-        this._numPts = 200;
+        this._height = 65;
+        this._numPts = 500;
         this._ranges = ranges;
+        this._labels = labels;
+        this._textSize = 10;
         this._numRanges = ranges.length;
         this._p.createCanvas(width, this._height * this._numRanges);
     }
@@ -15,6 +17,7 @@ class graph {
     draw(){
         this._p.background(255);
         this.drawLines();
+        this.drawLabels();
     }
 
     drawLines(){
@@ -43,6 +46,15 @@ class graph {
                 py = y;
             } 
         }
+    }
+
+    drawLabels(){
+        this._p.textSize(this._textSize);
+        this._p.noStroke();
+        for(let j = 0; j < this._numRanges; j++){
+            this._p.text(this._labels[j], 5, this._textSize + j * this._height);
+        }
+        
     }
 
     addValue(val){
