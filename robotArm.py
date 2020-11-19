@@ -7,31 +7,40 @@ from controller import AxisController
 class RobotArm(object):
     def __init__(self, uI):
         self.updateInterval = uI
+        #axis limits
         self.limitP = np.array([math.pi * (3/4), math.pi * (3/4), math.pi * (3/4), 100])
         self.limitN = np.array([- math.pi * (3/4), - math.pi * (3/4), - math.pi * (3/4), 0])
+        
+        #physics model of the robot
         self.robotModel = Model(0.1, self.updateInterval)
+        #commanded torque
         self.torqueCommand = np.zeros((4, 1)) #Nm
+        #controller
         self.robotAxisController = AxisController(self.updateInterval)
-
+        
+        #interval for visu update
         self.visuInterval = 5
         self.intervalCounter = 0
         
     def update(self):
-        
-        self.torqueCommand = self.robotAxisController.update()
+        #getting the torque Command from the Controller
+        self.torqueCommand = self.robotAxisController.update(self.robotModel.posAxis, self.robotModel.speedMotors)
         self.robotModel.setMotorTorques(self.torqueCommand)
+
+        #updating the robot model
         self.robotModel.update()
         
+        #updating the visualization
         if(self.intervalCounter > self.visuInterval):
             self.updateVisu(self.robotModel.posAxis)
             self.intervalCounter = 0
         self.intervalCounter += 1
 
+    #storing current position to json file
     def updateVisu(self, pos):
         if isinstance(pos, np.ndarray):
             pos =  pos.ravel().tolist()
         filename = 'control.json'
-        print(pos)
         with open(filename, 'r') as f:
             data = json.load(f)
             data["robotPosition"]["a1"] = pos[0] 
@@ -46,6 +55,7 @@ class RobotArm(object):
         # rename temporary file replacing old file
         os.rename(tempfile, filename)
 
+    #setter function for Target Axis position using Axis Limits
     def setTargetPosAxis(self, target):
         for i in range(4):
             if (target[i] > self.limitP[i]):
@@ -54,4 +64,4 @@ class RobotArm(object):
                 target[i] = self.limitN[i]
             else: 
                 target[i] = target[i]
-        self.robotAxisController.setTarget(target)
+        self.robotAxisController.setTargetPos(target)

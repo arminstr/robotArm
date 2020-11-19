@@ -1,4 +1,7 @@
 # copyright 2020 Armin Straller
+# modelling the kinematic attributes of the robotArm
+# currently working with torque commands. assuming an ideal toruqe behaviour.
+# TODO: adding a small first order lag could make sense. 
 import math
 import numpy as np
 
@@ -25,8 +28,11 @@ class Model(object):
     def update(self):
         self.calculateInertia()
         for i in range(3):
-            self.motorController(i)
-        self.linearController(3)
+            self.motorConversion(i)
+        self.linearConversion(3)
+        self.speedMotors[0] = self.omegaMotors[0]
+        self.speedMotors[1] = self.omegaMotors[1]
+        self.speedMotors[2] = self.omegaMotors[2]
     
     # Inertia calculation assumes that the loads of each individual arm act as point load at the center of the arm. 
     # This way the intertia can be easily calculated per simulation cycle depending on the joint angles.
@@ -41,7 +47,8 @@ class Model(object):
         
         self.inertiaAxis[0] = (self.armLength[0] / 2) ** 2 * self.armLoads[0] + lengthLoad1 ** 2 * self.armLoads[1] + lengthLoad2 ** 2 * self.armLoads[2]
 
-    def motorController(self, id):
+
+    def motorConversion(self, id):
         self.alphaMotors[id] = (self.torqueMotors[id] / self.transmissionMotors[id]) / self.inertiaAxis[id] # rad / (s**2)
         self.omegaMotors[id] = self.omegaMotors[id] + self.alphaMotors[id] * self.updateInterval
         #limiting speed to maximum Motor angular speed
@@ -53,11 +60,11 @@ class Model(object):
         #limiting position to maximum Motor position
 
 
-    def linearController(self, id):
+    def linearConversion(self, id):
         pass
 
     def setMotorTorques(self, torques):
-        for i in range(4):
+        for i in range(3):
             if (torques[i] > self.maxTorqueMotors[i]):
                 self.torqueMotors[i] = self.maxTorqueMotors[i]
             elif (torques[i] < - self.maxTorqueMotors[i]):
