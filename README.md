@@ -12,5 +12,6 @@ To prevent the Live Server from continuously updating add the following line to 
 ```json
 "liveServer.settings.ignoreFiles":["control.json"],
 ```
+A video of the running visualization can be found on my [YouTube Channel](https://youtu.be/ovK-GWrEEoU).
 
 ![Picture of web visu](media/first_visu.png)
