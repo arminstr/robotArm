@@ -1,18 +1,37 @@
+# copyright 2020 Armin Straller
 import os, json, uuid, math
 import numpy as np
-from model import model
+from model import Model
+from controller import AxisController
 
-class robotArm(object):
-    def __init__(self):
+class RobotArm(object):
+    def __init__(self, uI):
+        self.updateInterval = uI
         self.limitP = np.array([math.pi * (3/4), math.pi * (3/4), math.pi * (3/4), 100])
         self.limitN = np.array([- math.pi * (3/4), - math.pi * (3/4), - math.pi * (3/4), 0])
-        self.targetPos = np.zeros((4, 1))
-        self.pos = np.zeros((4, 1))
+        self.robotModel = Model(0.1, self.updateInterval)
+        self.torqueCommand = np.zeros((4, 1)) #Nm
+        self.robotAxisController = AxisController(self.updateInterval)
+
+        self.visuInterval = 5
+        self.intervalCounter = 0
+        
     def update(self):
-        self.updateVisu(self.pos)
+        
+        self.torqueCommand = self.robotAxisController.update()
+        self.robotModel.setMotorTorques(self.torqueCommand)
+        self.robotModel.update()
+        
+        if(self.intervalCounter > self.visuInterval):
+            self.updateVisu(self.robotModel.posAxis)
+            self.intervalCounter = 0
+        self.intervalCounter += 1
 
     def updateVisu(self, pos):
+        if isinstance(pos, np.ndarray):
+            pos =  pos.ravel().tolist()
         filename = 'control.json'
+        print(pos)
         with open(filename, 'r') as f:
             data = json.load(f)
             data["robotPosition"]["a1"] = pos[0] 
@@ -28,5 +47,11 @@ class robotArm(object):
         os.rename(tempfile, filename)
 
     def setTargetPosAxis(self, target):
-        self.targetPos = target
-        self.pos = self.targetPos
+        for i in range(4):
+            if (target[i] > self.limitP[i]):
+                target[i] = self.limitP[i]
+            elif (target[i] < self.limitN[i]):
+                target[i] = self.limitN[i]
+            else: 
+                target[i] = target[i]
+        self.robotAxisController.setTarget(target)

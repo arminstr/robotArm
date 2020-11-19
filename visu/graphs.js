@@ -1,3 +1,4 @@
+// copyright 2020 Armin Straller
 class graph {
     constructor(p, width, ranges, labels){
         this._p = p;

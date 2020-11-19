@@ -1,4 +1,4 @@
-
+// copyright 2020 Armin Straller
 var sketchOne = function(p) {
   p.roArm;
   p.setup = function() {
