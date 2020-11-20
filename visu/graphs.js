@@ -7,7 +7,7 @@ class graph {
         this._writePos = 0;
         this._valuesX = [];
         this._height = 65;
-        this._numPts = 500;
+        this._numPts = 2000;
         this._ranges = ranges;
         this._labels = labels;
         this._textSize = 10;

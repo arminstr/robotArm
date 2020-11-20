@@ -14,7 +14,7 @@ while 1:
     roArm.update()
     time.sleep(interval - ((time.time() - starttime) % interval))
     i += 1
-    if (i > interval * 10000 * 3):
-        roArm.setTargetPosAxis(np.array([-math.pi*(0.5/4), math.pi*(3/4), 0, 0]))
+    if (i > interval * 10000 * 5):
+        roArm.setTargetPosAxis(np.array([math.pi*(-2/4), math.pi*(0/4), 0, 0]))
         i = 0
     print(i)
