@@ -2,7 +2,7 @@
 import os, json, uuid, math
 import numpy as np
 from model import Model
-from controller import AxisController
+from controller import MotorPositionController
 
 class RobotArm(object):
     def __init__(self, uI):
@@ -16,15 +16,15 @@ class RobotArm(object):
         #commanded torque
         self.torqueCommand = np.zeros((4, 1)) #Nm
         #controller
-        self.robotAxisController = AxisController(self.updateInterval)
+        self.robotMotorController = MotorPositionController(self.updateInterval, self.robotModel.maxOmegaMotors)
         
         #interval for visu update
-        self.visuInterval = 5
+        self.visuInterval = 50
         self.intervalCounter = 0
         
     def update(self):
         #getting the torque Command from the Controller
-        self.torqueCommand = self.robotAxisController.update(self.robotModel.posAxis, self.robotModel.speedMotors)
+        self.torqueCommand = self.robotMotorController.update(self.robotModel.posAxis, self.robotModel.speedMotors)
         self.robotModel.setMotorTorques(self.torqueCommand)
 
         #updating the robot model
@@ -57,6 +57,7 @@ class RobotArm(object):
 
     #setter function for Target Axis position using Axis Limits
     def setTargetPosAxis(self, target):
+        print(target)
         for i in range(4):
             if (target[i] > self.limitP[i]):
                 target[i] = self.limitP[i]
@@ -64,4 +65,4 @@ class RobotArm(object):
                 target[i] = self.limitN[i]
             else: 
                 target[i] = target[i]
-        self.robotAxisController.setTargetPos(target)
+        self.robotMotorController.setTargetPos(target)
