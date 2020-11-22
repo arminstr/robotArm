@@ -33,7 +33,6 @@ class MotorPositionController(object):
         for i in range(4):
             self.positionController(i)
             self.speedController(i)
-        print(self.targetMotorPos[1],self.posMotor[1], self.integralP[1], self.targetMotorSpeed[1], self.speedMotor[1])
         return self.targetMotorTorque
 
     def speedController(self, id):
@@ -73,5 +72,67 @@ class MotorPositionController(object):
         self.targetMotorSpeed[id] = commandValue
 
     # send limited target Position Array 
-    def setTargetPos(self, targetPos):
+    def setTargetPosMotor(self, targetPos):
         self.targetMotorPos = targetPos
+
+class AxisPositionController(object):
+    def __init__(self, uI, lP, lN):
+        self.updateInterval = uI
+        self.targetAxisPos = np.zeros((4, 1))
+        self.posAxis = np.zeros((4, 1))
+        self.limitP = lP
+        self.limitN = lN
+
+        self.targetMotorPos = np.zeros((4, 1))
+
+        self.KpP = np.array([5.5, 5, 0, 0]) #
+        self.KiP = np.array([0, 0, 0, 0])
+        self.KdP = np.array([5000, 1000, 0, 0]) #
+        self.integralP = np.zeros((4, 1))
+        self.lastErrorP = np.zeros((4, 1))
+        self.pClamp = 0
+        self.pSignComp = 0
+        
+
+    def update(self, posAxis):
+        self.posAxis = posAxis
+        for i in range(4):
+            self.positionController(i)
+
+        print(self.targetAxisPos[0], self.posAxis[0], self.integralP[0], self.targetMotorPos[0])
+        return self.targetMotorPos
+
+    def positionController(self, id):
+        #error calculation
+        error = self.targetAxisPos[id] - self.posAxis[id]
+        
+        #check if the output is clamped and the error sign is different from the actuator command value sign
+        if(self.pClamp and self.pSignComp):
+            pass
+        else:
+            self.integralP[id]  += error * self.KiP[id]
+        
+        #derivative part of the pid
+        derivate = error - self.lastErrorP[id]  
+        self.lastErrorP[id] = error
+
+        commandValue = error * self.KpP[id] + self.integralP[id] + derivate * self.KdP[id]
+        #commandValue clamping
+        self.pClamp = 0
+        if(commandValue > 0.9 * self.limitP[id]):
+            self.pClamp = 1
+            commandValue = 0.9 * self.limitP[id]
+        if(commandValue < 0.9 * self.limitN[id]):
+            self.pClamp = 1
+            commandValue = 0.9 * self.limitN[id]
+        
+        #sign comparison
+        self.pSignComp = 0
+        if (error < 0 and commandValue < 0 or error > 0 and commandValue > 0):
+            self.pSignComp = 1
+        #print(commandValue)
+        self.targetMotorPos[id] = commandValue
+
+    # send limited target Position Array 
+    def setTargetPosAxis(self, targetPos):
+        self.targetAxisPos = targetPos

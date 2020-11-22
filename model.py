@@ -26,7 +26,7 @@ class Model(object):
         self.updateInterval = uI    
 
     def update(self):
-        self.calculateInertia()
+        self.calculateInertiaAxis()
         for i in range(3):
             self.motorConversion(i)
         self.linearConversion(3)
@@ -36,7 +36,7 @@ class Model(object):
     
     # Inertia calculation assumes that the loads of each individual arm act as point load at the center of the arm. 
     # This way the intertia can be easily calculated per simulation cycle depending on the joint angles.
-    def calculateInertia(self):
+    def calculateInertiaAxis(self):
         self.inertiaAxis[2] = (self.armLength[2] / 2) ** 2 * self.armLoads[2]
         self.inertiaAxis[1] = (self.armLength[1] / 2) ** 2 * (self.armLoads[1] + self.armLength[1] ** 2 * self.armLoads[2])
         
@@ -46,7 +46,6 @@ class Model(object):
                                     (math.cos(self.posAxis[0]) * self.armLength[0] + math.cos(self.posAxis[1]) * (self.armLength[1]))**2 )
         
         self.inertiaAxis[0] = (self.armLength[0] / 2) ** 2 * self.armLoads[0] + lengthLoad1 ** 2 * self.armLoads[1] + lengthLoad2 ** 2 * self.armLoads[2]
-
 
     def motorConversion(self, id):
         self.alphaMotors[id] = (self.torqueMotors[id] / self.transmissionMotors[id]) / self.inertiaAxis[id] # rad / (s**2)

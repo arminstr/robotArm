@@ -14,10 +14,10 @@ while 1:
     roArm.update()
     time.sleep(interval - ((time.time() - starttime) % interval))
     i += 1
-    if (i == 3000):
-        roArm.setTargetPosAxis(np.array([math.pi*(2/4), math.pi*(3/4), 0, 0]))
-    if (i == 6000):
-        roArm.setTargetPosAxis(np.array([math.pi*(0/4), math.pi*(0/4), 0, 0]))
+    if (i == 5000):
+        roArm.setTargetPosAxis(np.array([math.pi*(-2/4), math.pi*(3/4), 0, 0]))
+    if (i == 10000):
+        roArm.setTargetPosAxis(np.array([math.pi*(2/4), math.pi*(-3/4), 0, 0]))
         i = 0
 
     #i = i + 0.0005
