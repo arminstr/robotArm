@@ -1,7 +1,7 @@
 # copyright 2020 Armin Straller
 import os, json, uuid, math
 import numpy as np
-from model import Model
+from mathModel import Model
 from controller import MotorPositionController, AxisPositionController
 
 class RobotArm(object):
