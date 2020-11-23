@@ -35,7 +35,6 @@ class DirectKinematicsModel(object):
     def getCartesianPos(self):
         z = self.T04[2][3]
         retValue = np.array([[self.T04[0][3],   self.T04[1][3],     z.reshape(-1).ravel().tolist(),      math.acos(self.T04[0][0])]]).T
-        print(retValue)
         return retValue
 
 # The inverse kinematics model determines the individual joint angles and extensions 
