@@ -30,8 +30,8 @@ function update() {
 }
 
 function gotData(data) {
-  var roPos = data.robotPosition;
-  p5One.roArm.armAngles = p5One.createVector(roPos.a1, roPos.a2, roPos.a3);
-  p5One.roArm.zDistance = roPos.z;
-  p5Two.graphOne.addValue([roPos.a1 + p5Two.PI, roPos.a2 + p5Two.PI, roPos.z, roPos.a3 + p5Two.PI * 4]);
+  var axisPosition = data.axisPos;
+  p5One.roArm.armAngles = p5One.createVector(axisPosition.a1, axisPosition.a2, axisPosition.a3);
+  p5One.roArm.zDistance = axisPosition.z;
+  p5Two.graphOne.addValue([axisPosition.a1 + p5Two.PI, axisPosition.a2 + p5Two.PI, axisPosition.z, axisPosition.a3 + p5Two.PI * 4]);
 }

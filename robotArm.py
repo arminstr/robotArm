@@ -1,7 +1,7 @@
 # copyright 2020 Armin Straller
 import os, json, uuid, math
 import numpy as np
-from mathModel import DynamicModel
+from mathModel import DirectKinematicsModel, DynamicModel
 from controller import PDController
 
 class RobotArm(object):
@@ -21,6 +21,7 @@ class RobotArm(object):
         self.limitSpeedTrans = (math.pi * 2 * self.limitSpeed) / self.tauTransmission
 
         # math models
+        self.dirKinModel = DirectKinematicsModel(0.25, 0.25, 0)
         self.dynModel = DynamicModel(0.25, 0.25, 0, 0.12, 0.13, 2, 3, 1, 0.02, 0.01, 1.35e-5, self.tauTransmission)
 
         # position controllers 
@@ -32,6 +33,9 @@ class RobotArm(object):
         self.q = np.zeros((4,1))
         self.qdot = np.zeros((4,1))
         self.qdotdot = np.zeros((4,1))
+
+
+        self.pos = np.zeros((4,1))
         #interval for visu update
         self.visuInterval = 50
         self.intervalCounter = 0
@@ -49,23 +53,26 @@ class RobotArm(object):
                 self.qdot[i] = - 0.9 * self.limitSpeedTrans[i]
         
         self.q += self.qdot * self.updateInterval
+
+        self.dirKinModel.update(self.q)
+        self.pos = self.dirKinModel.getCartesianPos()
         #updating the visualization
         if(self.intervalCounter > self.visuInterval):
-            self.updateVisu(self.q)
+            self.updateVisu(self.q, self.pos)
             self.intervalCounter = 0
         self.intervalCounter += 1
 
     #storing current position to json file
-    def updateVisu(self, q):
+    def updateVisu(self, q, p):
         if isinstance(q, np.ndarray):
             q =  q.ravel().tolist()
         filename = 'control.json'
         with open(filename, 'r') as f:
             data = json.load(f)
-            data["robotPosition"]["a1"] =   q[0]
-            data["robotPosition"]["a2"] =   q[1]
-            data["robotPosition"]["a3"] =   q[3]
-            data["robotPosition"]["z"] =    q[2] * 1000 # convert from m to mm
+            data["axisPos"]["a1"] =   q[0]
+            data["axisPos"]["a2"] =   q[1]
+            data["axisPos"]["a3"] =   q[3]
+            data["axisPos"]["z"] =    q[2] * 1000 # convert from m to mm
         # create randomly named temporary file to avoid 
         # interference with other thread/asynchronous request
         tempfile = os.path.join(os.path.dirname(filename), str(uuid.uuid4()))

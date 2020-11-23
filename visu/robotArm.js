@@ -36,7 +36,7 @@ class robotArm {
         if(this._drawCoord)
         {
             this.drawBaseCoordinateSystem();
-            this.drawCoordinateSystem();
+            this.drawCoordinateSystem()
         }
     }
 
@@ -100,22 +100,31 @@ class robotArm {
     }
 
     drawCoordinateSystem(){
+        let dX = this._p.sin(this._armAngles.x) * this._armOneLength + this._p.sin(this._armAngles.y + this._armAngles.x) * this._armTwoLength;
+        let dY = this._zDistance;
+        let dZ = this._baseLength + (this._p.cos(this._armAngles.x) * this._armOneLength) + this._p.cos(this._armAngles.y + this._armAngles.x) * this._armTwoLength;
+        
         // x red, y green z blue
         //x line coord 
         var coordLength = 100/this._divisor;
         this._p.push();
         this._p.stroke(255,0,0);
-        this._p.line(this._positionBase.x, this._positionBase.y, this._positionBase.z, this._positionBase.x + coordLength, this._positionBase.y, this._positionBase.z);
+        this._p.translate(this._positionBase.x + dX, this._positionBase.y + dY, this._positionBase.z + dZ);
+        this._p.rotateY(this._armAngles.z + this._armAngles.y + this._armAngles.x);
+        this._p.line(0, 0, 0, 0 + coordLength, 0, 0);
         this._p.pop();
         //y line coord 
         this._p.push();
-        this._p.stroke(0,255,0);
-        this._p.line(this._positionBase.x, this._positionBase.y, this._positionBase.z, this._positionBase.x, this._positionBase.y + coordLength, this._positionBase.z);
+        this._p.stroke(0,255,0);this._p.translate(this._positionBase.x + dX, this._positionBase.y + dY, this._positionBase.z + dZ);
+        this._p.rotateY(this._armAngles.z + this._armAngles.y + this._armAngles.x);
+        this._p.line(0, 0, 0, 0, 0 + coordLength, 0);
         this._p.pop();
         //z line coord 
         this._p.push();
         this._p.stroke(0,0,255);
-        this._p.line(this._positionBase.x, this._positionBase.y, this._positionBase.z, this._positionBase.x, this._positionBase.y, this._positionBase.z + coordLength);
+        this._p.translate(this._positionBase.x + dX, this._positionBase.y + dY, this._positionBase.z + dZ);
+        this._p.rotateY(this._armAngles.z + this._armAngles.y + this._armAngles.x);
+        this._p.line(0, 0, 0, 0, 0, 0 + coordLength);
         this._p.pop();
     }
 

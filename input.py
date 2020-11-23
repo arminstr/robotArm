@@ -7,7 +7,7 @@ starttime = time.time()
 interval = 0.001 #call loop every 10ms
 
 roArm = RobotArm(interval)
-roArm.updateVisu(roArm.q)
+roArm.updateVisu(roArm.q, np.zeros((4,1)))
 time.sleep(5)
 i = 0
 while 1:
@@ -17,7 +17,7 @@ while 1:
     if (i == 5000):
         roArm.setTargetPosAxis(math.pi*(2/4), - math.pi*(2/4),0.2, 2 * math.pi)
     if (i == 10000):
-        roArm.setTargetPosAxis(-math.pi*(2/4), + math.pi*(3/4),0, -4 * math.pi)
+        roArm.setTargetPosAxis(-math.pi*(2/4), + math.pi*(3/4),0, 0.5 * math.pi)
         i = 0
 
     #i = i + 0.0005
