@@ -130,4 +130,8 @@ class robotArm {
     set zDistance(z) {
         this._zDistance = z/this._divisor;
     }
+
+    get divisor(){
+        return this._divisor;
+    }
 }

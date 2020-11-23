@@ -108,7 +108,7 @@ class DifferentialKinematicsModel(object):
 # and the motion of the structure
 # Frictions are neglected
 class DynamicModel(object):
-    def __init__(self, lengthA1, lengthA2, offsetZ, lengthCOGA1, lengthCOGA2, massLink1, massLink2, massLink34, intertiaL1, intertiaL2, intertiaL4):
+    def __init__(self, lengthA1, lengthA2, offsetZ, lengthCOGA1, lengthCOGA2, massLink1, massLink2, massLink34, intertiaL1, intertiaL2, intertiaL4, transmission):
         self.g0 = 9.81
         self.mL1 = massLink1
         self.mL2 = massLink2
@@ -122,9 +122,9 @@ class DynamicModel(object):
         self.JL1 = intertiaL1
         self.JL2 = intertiaL2
         self.JL4 = intertiaL4
-        self.tauTransmission = np.array([[2, 2, 4, 2]]).T
+        self.tauTransmission = transmission
         # gravitational matrix
-        self.g = np.array([[0, 0,self.mL34 * self.g0,0]]).T
+        self.g = np.array([[0, 0, self.mL34 * self.g0, 0]]).T
         self.C = np.zeros((4,4))
         self.M = np.zeros((4,4))
         self.tau = np.zeros((4,1))
