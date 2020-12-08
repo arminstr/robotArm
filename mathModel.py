@@ -32,10 +32,6 @@ class DirectKinematicsModel(object):
                                 [s12m4,     -c12m4,     0,  self.a2 * s12 + self.a1 * s1],
                                 [0,         0,          -1, -self.d3 + self.d4],
                                 [0,         0,          0,  1]])
-    def getCartesianPos(self):
-        z = self.T04[2][3]
-        retValue = np.array([[self.T04[0][3],   self.T04[1][3],     z.reshape(-1).ravel().tolist(),      math.acos(self.T04[0][0])]]).T
-        return retValue
 
 # The inverse kinematics model determines the individual joint angles and extensions 
 # based on a given end effector position and rotation.
@@ -57,27 +53,28 @@ class InverseKinematicsModel(object):
     def update(self, p, r, beta):
         self.P = p
         self.R = r
-        self.T04 = np.array([   [self.R[1][1],  self.R[1][2],   self.R[1][3],   self.P[1]],
-                                [self.R[2][1],  self.R[2][2],   self.R[2][3],   self.P[2]],
-                                [self.R[3][1],  self.R[3][2],   self.R[3][3],   self.P[3]],
+        self.T04 = np.array([   [self.R[0][0],  self.R[0][1],   self.R[0][2],   self.P[0]],
+                                [self.R[1][0],  self.R[1][1],   self.R[1][2],   self.P[1]],
+                                [self.R[2][0],  self.R[2][1],   self.R[2][2],   self.P[2]],
                                 [0,             0,              0,              1]])
         
         # z distance
-        self.d3 = self.d4 - self.P[3]
+        self.d3 = self.d4 + self.P[2]
 
         # joint 2 
-        c2 = (self.P[1] ** 2 + self.P[2] ** 2 - (self.a1 ** 2 + self.a2 ** 2)) / (2 * self.a1 * self.a2)
+        c2 = (self.P[0] ** 2 + self.P[1] ** 2 - (self.a1 ** 2 + self.a2 ** 2)) / (2 * self.a1 * self.a2)
         s2 = math.sqrt(1 - c2 ** 2)
         self.theta2 = math.atan2(s2, c2)
 
         # joint 1
-        s1 = ((self.a1 + self.a2 * c2) * self.P[2] - self.a2 * s2 * self.P[1]) / (self.P[1] ** 2 + self.P[2] ** 2)
-        self.theta1 = math.asin(s1)
+        if(self.P[0] > 0 or self.P[1] > 0):
+            s1 = ((self.a1 + self.a2 * c2) * self.P[1] - self.a2 * s2 * self.P[0]) / (self.P[0] ** 2 + self.P[1] ** 2)
+            self.theta1 = math.asin(s1)
         
         self.beta = beta
-        self.theta4 = self.theta1 + self.theta2 - self.beta
+        self.theta4 = self.beta - self.theta1 - self.theta2
 
-        self.q = np.array([self.theta1, self.theta2, self.d3, self.theta4])
+        self.q = np.array([ [self.theta1, self.theta2, np.asscalar(self.d3), self.theta4] ]).T
 
 # The differential kinematics model gives the relationship between the joint velocities 
 # and the corresponding linear and angular velocities

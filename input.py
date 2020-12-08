@@ -4,10 +4,10 @@ import random, math, time
 import numpy as np
 
 starttime = time.time()
-interval = 0.001 #call loop every 10ms
+interval = 0.001 #call loop every 1ms
 
 roArm = RobotArm(interval)
-roArm.updateVisu(roArm.q, np.zeros((4,1)))
+roArm.updateVisu(roArm.q)
 time.sleep(5)
 i = 0
 while 1:
@@ -15,9 +15,18 @@ while 1:
     time.sleep(interval - ((time.time() - starttime) % interval))
     i += 1
     if (i == 5000):
-        roArm.setTargetPosAxis(math.pi*(2/4), - math.pi*(2/4),0.2, 2 * math.pi)
-    if (i == 10000):
-        roArm.setTargetPosAxis(-math.pi*(2/4), + math.pi*(3/4),0, 0.5 * math.pi)
+        roArm.setTargetPosCartesian(0.2, 0, 0.2, 0)
+        #targetPos = np.array([[math.pi*(2/4), - math.pi*(2/4),0.2, 2 * math.pi]]).T
+        #roArm.setTargetPosAxis(targetPos)
+    if (i == 6000):
+        roArm.setTargetPosCartesian(0.4, 0.3, 0.1, 0)
+        #targetPos = np.array([[-math.pi*(2/4), + math.pi*(2/4),0.2, 2 * math.pi]]).T
+        #roArm.setTargetPosAxis(targetPos)
+    if (i == 7000):
+        roArm.setTargetPosCartesian(0.5, 0, 0, 0)
+        #targetPos = np.array([[-math.pi*(2/4), + math.pi*(2/4),0.2, 2 * math.pi]]).T
+        #roArm.setTargetPosAxis(targetPos)
+
         i = 0
 
     #i = i + 0.0005
