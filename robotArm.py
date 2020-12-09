@@ -4,6 +4,7 @@ import numpy as np
 from mathModel import DirectKinematicsModel, InverseKinematicsModel, DynamicModel
 from controller import PDController
 
+
 class RobotArm(object):
     def __init__(self, uI):
         self.updateInterval = uI
@@ -13,7 +14,7 @@ class RobotArm(object):
         
         # motor torque limit and torque transmission
         self.limitTau = np.array([[1.9, 0.72, 10, 0.72]]).T
-        self.tauTransmission = np.array([[2, 2, 4, 2]]).T
+        self.tauTransmission = np.array([[2, 2, 4, 1.5]]).T
 
          # motor speed limit and torque transmission
         self.limitSpeed = np.array([[20, 20, 1, 20]]).T
@@ -39,7 +40,7 @@ class RobotArm(object):
         self.qdot = np.zeros((4,1))
         self.qdotdot = np.zeros((4,1))
 
-        self.pos = np.zeros((4,1))
+        self.pos = np.zeros((3,1))
         #interval for visu update
         self.visuInterval = 100
         self.intervalCounter = 0
@@ -58,7 +59,8 @@ class RobotArm(object):
         
         self.q += self.qdot * self.updateInterval
 
-        #self.dirKinModel.update(self.q)
+        self.dirKinModel.update(self.q)
+        self.pos = self.dirKinModel.pos
 
         self.invKinModel.update(self.pTarget, self.rTarget, self.betaTarget)
         self.setTargetPosAxis(self.invKinModel.q)
@@ -91,10 +93,11 @@ class RobotArm(object):
     #setter function for Target Axis position
     def setTargetPosAxis(self, q):
         self.qTarget = q
-    #setter function for Target cartesian position
+    
+    #setter function for Target cartesian position including looping distance in percent ( lDP )
     def setTargetPosCartesian(self, x, y, z, beta):
         self.pTarget = np.array([[x, y, z]]).T
         self.rTarget = np.zeros((3,3))
         self.betaTarget = beta
             
-        
+

@@ -16,6 +16,7 @@ class DirectKinematicsModel(object):
         self.d3 = 0
         self.theta4 = 0
         self.T04 = np.zeros((4,4))
+        self.pos = np.zeros((3,1))
     def update(self, q):
         self.theta1 = q[0]
         self.theta2 = q[1]
@@ -32,6 +33,10 @@ class DirectKinematicsModel(object):
                                 [s12m4,     -c12m4,     0,  self.a2 * s12 + self.a1 * s1],
                                 [0,         0,          -1, -self.d3 + self.d4],
                                 [0,         0,          0,  1]])
+        
+        #set cartesian pos
+        z = self.T04[2][3]
+        self.pos = np.array([[self.T04[0][3],   self.T04[1][3],     - np.asscalar(z) ]]).T
 
 # The inverse kinematics model determines the individual joint angles and extensions 
 # based on a given end effector position and rotation.
