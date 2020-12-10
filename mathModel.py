@@ -67,9 +67,14 @@ class InverseKinematicsModel(object):
         self.d3 = self.d4 + self.P[2]
 
         # joint 2 
-        c2 = (self.P[0] ** 2 + self.P[1] ** 2 - (self.a1 ** 2 + self.a2 ** 2)) / (2 * self.a1 * self.a2)
-        s2 = math.sqrt(1 - c2 ** 2)
-        self.theta2 = math.atan2(s2, c2)
+        if(self.P[1] < 0):
+            c2 = (self.P[0] ** 2 + self.P[1] ** 2 - (self.a1 ** 2 + self.a2 ** 2)) / (2 * self.a1 * self.a2)
+            s2 = - math.sqrt(1 - c2 ** 2)
+            self.theta2 = math.atan2(s2, c2)
+        if(self.P[1] >= 0):
+            c2 = (self.P[0] ** 2 + self.P[1] ** 2 - (self.a1 ** 2 + self.a2 ** 2)) / (2 * self.a1 * self.a2)
+            s2 = math.sqrt(1 - c2 ** 2)
+            self.theta2 = math.atan2(s2, c2)
 
         # joint 1
         if(self.P[0] > 0 or self.P[1] > 0):
